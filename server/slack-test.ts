@@ -79,3 +79,4 @@ async function testSlackIntegration() {
 
 // Run the test
 testSlackIntegration().catch(console.error);
+

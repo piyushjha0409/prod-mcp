@@ -12,6 +12,9 @@
     "slack-test": "tsx server/slack-test.ts",
     "mcp-test": "tsx server/test-mcp-tools.ts",
     "mcp-server": "tsx server/mcp-server.ts",
+    "test": "tsx server/test-services.ts",
+    "test:unit": "tsx server/test-unit.ts",
+    "test:watch": "tsx watch server/test-services.ts",
     "server:dev": "tsx server/index.ts",
     "server:build": "tsc server/*.ts --outDir dist/server",
     "server:start": "node dist/server/index.js"
