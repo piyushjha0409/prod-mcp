@@ -54,6 +54,30 @@ export default function Home() {
   const parseUserInput = (input: string) => {
     const lowerInput = input.toLowerCase();
     
+    // Slack-related commands
+    if (lowerInput.includes('slack') && lowerInput.includes('test')) {
+      return { tool: 'test_slack_connection', args: {} };
+    }
+    
+    if (lowerInput.includes('slack') && lowerInput.includes('channels')) {
+      return { tool: 'get_slack_channels', args: {} };
+    }
+    
+    if (lowerInput.includes('slack') && lowerInput.includes('users')) {
+      return { tool: 'get_slack_users', args: { limit: 20 } };
+    }
+    
+    if (lowerInput.includes('send') && lowerInput.includes('slack') && lowerInput.includes('message')) {
+      // Extract channel and message from input
+      const channelMatch = input.match(/to\s+(\S+)/i);
+      const messageMatch = input.match(/message\s+"([^"]+)"/i) || input.match(/message\s+(.+)/i);
+      const channel = channelMatch ? channelMatch[1] : '#general';
+      const message = messageMatch ? messageMatch[1] : 'Hello from Productivity Assistant!';
+      
+      return { tool: 'send_slack_message', args: { channel, text: message } };
+    }
+    
+    // Calendar-related commands
     if (lowerInput.includes('next meeting') || lowerInput.includes('next event')) {
       return { tool: 'get_next_event', args: {} };
     }
@@ -86,7 +110,7 @@ export default function Home() {
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800">Productivity Assistant</h1>
           <p className="text-gray-500 mt-2">
-            Your AI-powered assistant for calendar and productivity management.
+            Your AI-powered assistant for calendar and productivity management with Slack integration.
           </p>
         </div>
 
@@ -120,6 +144,9 @@ export default function Home() {
                 <button onClick={() => quickAction('What is my next meeting?')} className="bg-gray-200 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Next meeting?</button>
                 <button onClick={() => quickAction('Find a 30 min slot for a meeting tomorrow')} className="bg-gray-200 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Find a 30 min slot</button>
                 <button onClick={() => quickAction('Get my upcoming events for this week')} className="bg-gray-200 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-gray-300 transition-colors">Upcoming events</button>
+                <button onClick={() => quickAction('Test slack connection')} className="bg-purple-200 text-purple-700 text-sm px-3 py-1 rounded-full hover:bg-purple-300 transition-colors">Test Slack</button>
+                <button onClick={() => quickAction('Get slack channels')} className="bg-purple-200 text-purple-700 text-sm px-3 py-1 rounded-full hover:bg-purple-300 transition-colors">Slack Channels</button>
+                <button onClick={() => quickAction('Send slack message to #general message "Hello from Productivity Assistant!"')} className="bg-purple-200 text-purple-700 text-sm px-3 py-1 rounded-full hover:bg-purple-300 transition-colors">Send Slack Message</button>
             </div>
             <form onSubmit={handleSubmit} className="flex items-center">
               <input
