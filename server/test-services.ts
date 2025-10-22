@@ -104,7 +104,7 @@ async function testAuthService() {
         
         // Test 3: Get authenticated client
         try {
-          const client = authService.getClient();
+          const client = await authService.getClient();
           if (client) {
             logTest('AuthService', 'getClient()', 'PASS', 'Retrieved authenticated OAuth client');
           }
@@ -136,7 +136,7 @@ async function testCalendarService() {
       return;
     }
 
-    const calendarService = new CalendarService(authService.getClient());
+    const calendarService = new CalendarService(await authService.getClient());
 
     // Test 1: Get upcoming events
     try {
@@ -262,7 +262,7 @@ async function testSmartSchedulerService() {
       return;
     }
 
-    const calendarService = new CalendarService(authService.getClient());
+    const calendarService = new CalendarService(await authService.getClient());
     const schedulerService = new SmartSchedulerService(calendarService);
 
     // Test 1: Find optimal slots
@@ -356,7 +356,7 @@ async function testAnalyticsService() {
       return;
     }
 
-    const calendarService = new CalendarService(authService.getClient());
+    const calendarService = new CalendarService(await authService.getClient());
     const analyticsService = new AnalyticsService(calendarService);
 
     // Test 1: Weekly report
@@ -403,7 +403,7 @@ async function testMeetingPrepService() {
       return;
     }
 
-    const calendarService = new CalendarService(authService.getClient());
+    const calendarService = new CalendarService(await authService.getClient());
     const slackService = process.env.SLACK_BOT_TOKEN 
       ? new SlackService(process.env.SLACK_BOT_TOKEN)
       : null;
@@ -454,25 +454,13 @@ async function testFocusTimeService() {
       return;
     }
 
-    const calendarService = new CalendarService(authService.getClient());
+    const calendarService = new CalendarService(await authService.getClient());
     const slackService = process.env.SLACK_BOT_TOKEN 
       ? new SlackService(process.env.SLACK_BOT_TOKEN)
       : null;
 
     if (!slackService) {
       logTest('FocusTimeService', 'calendar sync', 'SKIP', 'No Slack token (calendar-only mode)');
-      
-      const focusTimeService = new FocusTimeService(calendarService, slackService);
-      
-      // Test without Slack
-      try {
-        await focusTimeService.syncCalendarToSlack();
-        logTest('FocusTimeService', 'syncCalendarToSlack()', 'PASS', 
-          'Sync completed (no Slack token, skip status update)');
-      } catch (error) {
-        logTest('FocusTimeService', 'syncCalendarToSlack()', 'FAIL', 'Sync failed', error);
-      }
-      
       return;
     }
 

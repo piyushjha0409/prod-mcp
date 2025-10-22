@@ -18,8 +18,8 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 class ProductivityMCPServer {
   private server: Server;
-  private calendarTools: CalendarTools;
-  private slackTools: SlackTools;
+  private calendarTools!: CalendarTools;
+  private slackTools!: SlackTools;
 
   constructor() {
     this.server = new Server(
@@ -77,7 +77,7 @@ class ProductivityMCPServer {
       // Initialize services
       const calendarService = new CalendarService(authClient);
       const nlpService = new NLPService();
-      const slackService = new SlackService();
+      const slackService = new SlackService(process.env.SLACK_BOT_TOKEN || '');
       
       // Initialize tools
       this.calendarTools = new CalendarTools(calendarService, nlpService);

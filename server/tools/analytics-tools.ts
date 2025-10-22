@@ -172,7 +172,7 @@ export class AnalyticsTools {
   private async prepareMeeting(args: any) {
     const { eventId } = PrepareMeetingSchema.parse(args);
 
-    const context = await this.meetingPrep.prepareMeeting(eventId);
+    const context = await this.meetingPrep.prepareMeeting(eventId || '');
 
     return {
       success: true,

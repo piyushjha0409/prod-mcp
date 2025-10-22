@@ -26,7 +26,7 @@ async function initializeServices() {
 
         const calendarService = new CalendarService(oauth2Client);
         const nlpService = new NLPService();
-        const slackService = new SlackService();
+        const slackService = new SlackService(process.env.SLACK_BOT_TOKEN || '');
 
         calendarTools = new CalendarTools(calendarService, nlpService);
         slackTools = new SlackTools(slackService);

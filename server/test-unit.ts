@@ -65,8 +65,8 @@ const testEventValidation = test('Calendar event structure validation', () => {
   };
   
   assert(event.summary.length > 0, 'Event must have a summary');
-  assert(event.start.dateTime, 'Event must have start time');
-  assert(event.end.dateTime, 'Event must have end time');
+  assert(!!event.start.dateTime, 'Event must have start time');
+  assert(!!event.end.dateTime, 'Event must have end time');
 });
 
 // ============================================================================
@@ -85,8 +85,8 @@ const testConflictDetection = test('Time slot conflict detection logic', () => {
   };
   
   const event2 = {
-    start: setHours(new Date(), 10, 30),
-    end: setHours(new Date(), 11, 30)
+    start: setMinutes(setHours(new Date(), 10), 30),
+    end: setMinutes(setHours(new Date(), 11), 30)
   };
   
   // Event1 ends when slot starts - no conflict

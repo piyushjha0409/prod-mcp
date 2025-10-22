@@ -11,7 +11,11 @@ async function testSlackIntegration() {
   try {
     // Test Slack service initialization
     console.log('1. Initializing Slack Service...');
-    const slackService = new SlackService();
+    const slackBotToken = process.env.SLACK_BOT_TOKEN;
+    if (!slackBotToken) {
+      throw new Error('SLACK_BOT_TOKEN is required in .env.local file');
+    }
+    const slackService = new SlackService(slackBotToken);
     console.log('✅ Slack Service initialized successfully\n');
 
     // Test connection

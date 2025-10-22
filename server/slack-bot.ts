@@ -1,4 +1,4 @@
-import { App, SlackEventMiddlewareArgs } from '@slack/bolt';
+import { App } from '@slack/bolt';
 import { AuthService } from './services/auth.service';
 import { CalendarService } from './services/calendar.service';
 import { NLPService } from './services/nlp.service';
@@ -61,7 +61,7 @@ async function initializeServices() {
 }
 
 // Handle app mentions (@bot)
-app.event('app_mention', async ({ event, client }: SlackEventMiddlewareArgs<'app_mention'>) => {
+app.event('app_mention', async ({ event, client }) => {
   try {
     const text = event.text.replace(/<@[^>]+>/, '').trim();
     
