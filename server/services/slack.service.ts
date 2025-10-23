@@ -167,19 +167,63 @@ export class SlackService {
   }
 
   /**
+   * Resolve channel name to channel ID
+   */
+  private async resolveChannel(channelInput: string): Promise<string> {
+    // If it looks like a channel ID (starts with C), return as-is
+    if (channelInput.match(/^[CG][A-Z0-9]+$/)) {
+      return channelInput;
+    }
+
+    // Remove # prefix if present
+    const channelName = channelInput.replace(/^#/, '');
+
+    // Try to find the channel by name
+    try {
+      const channels = await this.getChannels();
+      const channel = channels.find(
+        (ch: any) => ch.name === channelName || ch.name === channelInput
+      );
+      
+      if (channel?.id) {
+        return channel.id;
+      }
+    } catch (error) {
+      console.warn('Could not resolve channel name, trying as-is');
+    }
+
+    // Return original input and let Slack handle it
+    return channelInput;
+  }
+
+  /**
    * Send message to channel
    */
   async sendMessage(options: { channel: string; text: string; blocks?: any[] }): Promise<any> {
     try {
+      // Resolve channel name to ID
+      const channelId = await this.resolveChannel(options.channel);
+      
       const result = await this.client.chat.postMessage({
-        channel: options.channel,
+        channel: channelId,
         text: options.text,
         blocks: options.blocks,
       });
       console.log(`✅ Message sent to ${options.channel}`);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error('❌ Failed to send message:', error);
+      
+      // Provide helpful error message
+      if (error.data?.error === 'channel_not_found') {
+        const channels = await this.getChannels();
+        const channelList = channels.map((ch: any) => `#${ch.name} (${ch.id})`).join(', ');
+        throw new Error(
+          `Channel not found. Please make sure the bot is invited to the channel. ` +
+          `Available channels: ${channelList || 'None - please invite the bot to a channel first'}`
+        );
+      }
+      
       throw error;
     }
   }

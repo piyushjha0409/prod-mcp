@@ -2,10 +2,6 @@ import OpenAI from 'openai';
 import { CalendarEvent } from '../types/calendar.types';
 import { addMinutes } from 'date-fns';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 export interface ParsedEventIntent {
   action: 'create' | 'update' | 'delete' | 'query';
   event?: Partial<CalendarEvent>;
@@ -14,6 +10,15 @@ export interface ParsedEventIntent {
 }
 
 export class NLPService {
+  private openai: OpenAI;
+
+  constructor() {
+    // Lazy initialization - only create OpenAI client at runtime
+    this.openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY || '',
+    });
+  }
+
   async parseEventIntent(input: string): Promise<ParsedEventIntent> {
     const systemPrompt = `You are a calendar assistant. Parse the user's request into a structured calendar event.
 Current date/time: ${new Date().toISOString()}
@@ -34,7 +39,7 @@ Format:
 }`;
 
     try {
-      const response = await openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4-turbo-preview',
         messages: [
           { role: 'system', content: systemPrompt },

@@ -4,8 +4,6 @@ import { CalendarEvent } from '../types/calendar.types';
 import { parseISO, differenceInMinutes } from 'date-fns';
 import OpenAI from 'openai';
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
 export interface MeetingContext {
   event: CalendarEvent;
   relatedMessages: string[];
@@ -16,10 +14,17 @@ export interface MeetingContext {
 }
 
 export class MeetingPrepService {
+  private openai: OpenAI;
+
   constructor(
     private calendarService: CalendarService,
     private slackService?: SlackService
-  ) {}
+  ) {
+    // Lazy initialization - only create OpenAI client at runtime
+    this.openai = new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY || '' 
+    });
+  }
 
   /**
    * Prepare context for upcoming meeting
@@ -120,7 +125,7 @@ Return ONLY a JSON object with format: {"items":["point 1","point 2","point 3"]}
         throw new Error('OpenAI API key not configured');
       }
 
-      const response = await openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4-turbo-preview',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.7,
@@ -183,7 +188,7 @@ Return plain text, concise and actionable.`;
         return this.getFallbackSummary(event);
       }
 
-      const response = await openai.chat.completions.create({
+      const response = await this.openai.chat.completions.create({
         model: 'gpt-4-turbo-preview',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0.5,
